@@ -1,15 +1,18 @@
-Sun Nov  9 23:30:49 -03 2025:
+Fri Feb 27 08:44:44 -03 2026:
+    - comment code
+    - convert error to Result<(), Box<dyn Error>>
+Sun Nov 09 23:30:49 -03 2025:
     - use walkdir_minimal
     - restrict symlinks options
     - content only options
     - copy root dir by default
     - restrict special files
     - other fix security and functions
-Thu Nov  6 19:05:54 -03 2025:
+Thu Nov 06 19:05:54 -03 2025:
     - remove CopySumary unnecessary
     - always preserve permissions
     - fix copy file only
-Thu Nov  6 11:31:46 -03 2025:
+Thu Nov 06 11:31:46 -03 2025:
     - first version
     - recursive copy
     - basic security

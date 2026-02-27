@@ -1,3 +1,8 @@
+//! Library for recursive file and directory copying with symlink support.
+//!
+//! This module provides utilities to copy file system trees while handling
+//! permissions, symlinks, and directory structures on Unix-based systems.
+
 use std::collections::HashSet;
 use std::fs;
 use std::io::copy;
@@ -11,6 +16,16 @@ pub mod options;
 pub use error::CopyError;
 pub use options::CopyOptions;
 
+/// Recursively copies a file or directory from `src` to `dst`.
+///
+/// # Arguments
+/// * `src` - The path to the source file or directory.
+/// * `dst` - The destination path.
+/// * `opts` - Configuration options for the copy process.
+///
+/// # Returns
+/// * `Ok(())` if the copy operation was successful.
+/// * `Err(CopyError)` if an error occurred during the process (e.g., a source not found).
 pub fn copy_recursive(src: &Path, dst: &Path, opts: &CopyOptions) -> Result<(), CopyError> {
     if !src.exists() {
         return Err(CopyError::SrcNotFound(src.to_path_buf()));
@@ -53,6 +68,17 @@ pub fn copy_recursive(src: &Path, dst: &Path, opts: &CopyOptions) -> Result<(), 
     Err(CopyError::NotSupported(src.to_path_buf()))
 }
 
+/// Internal helper that traverses the directory tree and copies its contents.
+///
+/// # Arguments
+/// * `src` - Current source directory being walked.
+/// * `dst` - Destination directory where contents will be placed.
+/// * `opts` - User-defined copy options.
+/// * `visited` - A set of paths already visited to prevent infinite symlink loops.
+///
+/// # Returns
+/// * `Ok(())` on success.
+/// * `Err(CopyError)` if walking or copying fails.
 fn walk_and_copy(src: &Path, dst: &Path, opts: &CopyOptions, visited: &mut HashSet<PathBuf>
 ) -> Result<(), CopyError> {
     let real_src = src.to_path_buf();
@@ -121,7 +147,15 @@ fn walk_and_copy(src: &Path, dst: &Path, opts: &CopyOptions, visited: &mut HashS
     Ok(())
 }
 
-
+/// Copies a single file and preserves its Unix permissions.
+///
+/// # Arguments
+/// * `src` - Source file path.
+/// * `dst` - Destination file path.
+/// * `opts` - Options to determine if overwriting is allowed.
+///
+/// # Returns
+/// * `Ok(())` on successful file copy.
 fn copy_one(src: &Path, dst: &Path, opts: &CopyOptions) -> Result<(), CopyError> {
     if dst.exists() {
         if !opts.overwrite {
@@ -144,6 +178,16 @@ fn copy_one(src: &Path, dst: &Path, opts: &CopyOptions) -> Result<(), CopyError>
     Ok(())
 }
 
+/// Reads a symbolic link and recreates it at the destination.
+///
+/// # Arguments
+/// * `src` - The existing symbolic link path.
+/// * `dst` - The path where the new symlink will be created.
+/// * `opts` - Options to determine if overwriting an existing destination is allowed.
+///
+/// # Returns
+/// * `Ok(())` on success.
+/// * `Err(CopyError)` if the link cannot be read or created.
 fn recreate_symlink(src: &Path, dst: &Path, opts: &CopyOptions) -> Result<(), CopyError> {
     let target = fs::read_link(src)?;
     if dst.exists() {
