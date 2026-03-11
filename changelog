@@ -1,18 +1,19 @@
+Wed Mar 11 10:56:23 -03 2026:
+    - Update walkdir_minimal dependency to the latest version
 Fri Feb 27 08:44:44 -03 2026:
-    - comment code
-    - convert error to Result<(), Box<dyn Error>>
+    - Implement Rustdoc-compliant English documentation for core logic
+    - Refactor error handling to use Result<(), Box<dyn Error>> for trait object compatibility
 Sun Nov 09 23:30:49 -03 2025:
-    - use walkdir_minimal
-    - restrict symlinks options
-    - content only options
-    - copy root dir by default
-    - restrict special files
-    - other fix security and functions
+    - Integrate walkdir_minimal for optimized directory traversal
+    - Add configuration to restrict symbolic link following
+    - Implement "content-only" copy mode options
+    - Enable root directory replication by default
+    - Add filters to restrict the copying of special file types (FIFOs, sockets, etc.)
+    - General security hardening and functional bug fixes
 Thu Nov 06 19:05:54 -03 2025:
-    - remove CopySumary unnecessary
-    - always preserve permissions
-    - fix copy file only
+    - Deprecate and remove redundant CopySummary struct
+    - Ensure filesystem permissions are strictly preserved during I/O
+    - Fix edge case in single-file copy operations
 Thu Nov 06 11:31:46 -03 2025:
-    - first version
-    - recursive copy
-    - basic security
+    - Implement recursive directory tree copying
+    - Add initial security checks for path traversal protection

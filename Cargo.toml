@@ -1,14 +1,16 @@
 [package]
 name = "recursive_copy"
-version = "1.2.0"
+version = "1.2.1"
 edition = "2024"
 description = "A minimal, safe, and portable recursive copy library for Unix systems"
 authors = ["mxnt <m10ferrari1200@gmail.com>"]
 license = "MIT"
 repository = "https://github.com/LinuxDicasPro/recursive_copy"
+documentation = "https://docs.rs/recursive_copy/"
+homepage = "https://github.com/LinuxProativo/recursive_copy"
 readme = "README.md"
-keywords = ["cp", "copy", "recursive_copy", "rust", "linux"]
+keywords = ["cp", "copy", "recursive_copy", "linux"]
 categories = ["filesystem"]
 
 [dependencies]
-walkdir_minimal = "1.0"
+walkdir_minimal = "1.1"

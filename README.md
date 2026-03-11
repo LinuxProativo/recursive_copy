@@ -3,12 +3,22 @@
 </p>
 
 <h1 align="center">Recursive Copy for POSIX Systems</h1> 
+<h3 align="center">A lightweight and secure implementation of recursive directory
+copying for POSIX systems.</h3> 
 
-A lightweight, dependency-minimal, and secure implementation of recursive
-directory copying for POSIX systems. Designed around the principles of
-**minimalism**, **robustness**, and **predictability**, this module provides a
-low-level yet safe interface for copying files and directories recursively,
-while avoiding unnecessary abstractions or dependencies.
+<p align="center">
+    <img src="https://img.shields.io/badge/Platform-POSIX-FCC624?&logo=linux&style=flat-square"/>
+    <img src="https://img.shields.io/github/actions/workflow/status/LinuxProativo/recursive_copy/rust.yml?label=Test&style=flat-square&logo=github"/>
+    <img src="https://img.shields.io/badge/RustC-1.85+-orange?style=flat-square&logo=rust"/>
+    <img src="https://img.shields.io/github/languages/code-size/LinuxProativo/recursive_copy?style=flat-square&logo=rust&label=Code%20Size"/>
+</p>
+
+## 🔍 Overview
+
+`recursive_copy` is designed around the principles of **minimalism**, **robustness**,
+and **predictability**, this module provides a low-level yet safe interface for
+copying files and directories recursively, while avoiding unnecessary
+abstractions or dependencies.
 
 This implementation builds upon the custom crate
 [`walkdir_minimal`](https://crates.io/crates/walkdir_minimal), a POSIX-only
@@ -16,16 +26,32 @@ reimplementation of directory walking that avoids the overhead of the
 standard `walkdir` crate and provides fine-grained control over traversal
 depth, symbolic link handling, and filesystem limits.
 
+This crate is part of a minimalist POSIX-oriented Rust toolchain aimed at
+creating small, safe, and efficient filesystem utilities suitable for
+environments where reliability, clarity, and deterministic behavior are
+prioritized over feature bloat.
+
+If you find this project useful, consider starring the repository or
+contributing feedback to improve it further.
+
 ## ✨ Features
 
 * Fully recursive copy of directories and files.
+
 * Basic protection against symlink loops.
+
 * Configurable recursion depth limit (`depth`).
+
 * Efficient I/O with adjustable buffer size.
+
 * Safe defaults for minimal risk operations.
+
 * Automatically creates parent directories.
+
 * Respects the `overwrite` flag.
+
 * Uses an efficient buffered copy (`io::copy`).
+
 * Preserves permissions by copying mode bits from source to destination (`& 0o777`).
 
 ## 🪶 Philosophy
@@ -35,10 +61,13 @@ and **secure** file copy mechanism that works strictly within POSIX constraints.
 The design emphasizes:
 
 * **Minimal dependencies** – only the Rust standard library and
-* `walkdir_minimal` are used.
+  `walkdir_minimal` are used.
+
 * **Security** – prevents following dangerous symlinks, ignores special
-* files (devices, FIFOs, sockets), and sanitizes permissions.
+  files (devices, FIFOs, sockets), and sanitizes permissions.
+
 * **Simplicity** – clear and direct code flow with minimal abstraction.
+
 * **Predictability** – deterministic behavior with explicit user-controlled options.
 
 This makes it suitable for use in low-level environments, system utilities,
@@ -62,14 +91,19 @@ pub struct CopyOptions {
 Each field provides precise control over copy behavior:
 
 * **overwrite** – if `true`, existing destination files are replaced.
+
 * **restrict_symlinks** – block traversal of symlinks pointing outside the source
 directory (protects against path traversal).
+
 * **follow_symlinks** – if `true`, copies the target of symlinks; otherwise,
 recreates them as symlinks.
+
 * **content_only** – copies only the contents of the source directory into the
 destination (without creating a subdirectory).
+
 * **buffer_size** – controls the buffer used by the internal `io::copy`
 operation (default: 64 KiB).
+
 * **depth** – limits directory traversal depth (default: 512 levels).
 
 All fields have safe defaults via `CopyOptions::default()`.
@@ -92,11 +126,17 @@ pub enum CopyError {
 ```
 
 * **Io**: Any I/O failure during file operations.
+
 * **Walk**: Errors from `walkdir_minimal`, e.g. permission denied or traversal issues.
+
 * **DepthExceeded**: Triggered when the maximum depth limit is reached.
+
 * **SymlinkLoop**: Prevents infinite recursion by tracking visited paths.
+
 * **SrcNotFound**: Indicates that the source path does not exist.
+
 * **DestNotDir**: Raised when destination is not a directory but should be.
+
 * **NotSupported**: Returned for unsupported file types (devices, FIFOs, sockets, etc.).
 
 Errors are propagated using idiomatic Rust `Result` types, allowing simple and
@@ -115,13 +155,19 @@ directories, and symbolic links according to the configured options.
 ### High-level algorithm
 
 1. **Validate source** – checks whether `src` exists and determines its type.
+
 2. **Prepare destination** – ensures directories exist or are created as needed.
+
 3. **Handle file directly** – if `src` is a single file, copy it immediately.
+
 4. **Traverse recursively** – for directories, it uses `walkdir_minimal` to iterate
 over entries.
+
 5. **Filter unsupported types** – devices, FIFOs, and sockets are silently ignored.
+
 6. **Handle symlinks safely** – depending on `restrict_symlinks` and `follow_symlinks`
 flags, either replicate or skip them.
+
 7. **Preserve permissions** – sanitizes inherited permissions by masking to 0o777.
 
 This function serves as a high-level controller that delegates actual operations to
@@ -144,9 +190,13 @@ privilege escalation risks.
 This is the core recursion engine, built on top of `walkdir_minimal`.
 
 * Tracks visited directories using a `HashSet<PathBuf>` to avoid infinite loops.
+
 * Enforces a maximum traversal depth.
+
 * Supports optional symlink following and restriction logic.
+
 * Ignores unsupported file types.
+
 * Creates destination directories lazily when needed.
 
 ### Symlink Security
@@ -220,7 +270,9 @@ are **minimalism, security, and stability**.
 Please note:
 
 * New functionality should only be added behind **optional feature flags**.
+
 * The **default build** must remain dependency-free and minimal.
+
 * Focus on code clarity and POSIX compliance.
 
 
@@ -241,36 +293,27 @@ explicitly skipped to prevent accidental interference with system resources.
 ### Expected Behavior Summary
 
 * **Regular files:** Copied using `std::io::copy` with preserved permissions.
+
 * **Directories:** Recursively traversed and created as needed.
+
 * **Symlinks:** Either followed or re-created based on user options.
+
 * **Unsupported special files:** Ignored by design to ensure safety.
+
 * **Depth limit:** Ensures that extremely deep or cyclic structures do not cause
 stack overflows.
 
 These guarantees make the crate safe for system utilities, backup tools, and
 packaging systems that require fine control and predictable outcomes.
 
-## 📄 License
+## 📜 MIT License
 
-This project is licensed under the **MIT License**.
-See the [`LICENSE`](./LICENSE) file for full details.
+This repository has scripts that were created to be free software.  
+Therefore, they can be distributed and/or modified within the terms of the ***MIT License***.
 
-By contributing to this repository, you agree that your contributions
-will be licensed under the same MIT terms.
+> ### See the [MIT License](LICENSE) file for details.
 
-## 📄 Changelog
+## 📬 Contact & Support
 
-All notable changes to this project will be documented
-in the [`changelog`](./changelog) file.
-
-## 🧑‍💻 Author
-
-Created and maintained by **LinuxDicasPro**.
-
-This crate is part of a minimalist POSIX-oriented Rust toolchain aimed at
-creating small, safe, and efficient filesystem utilities suitable for
-environments where reliability, clarity, and deterministic behavior are
-prioritized over feature bloat.
-
-If you find this project useful, consider starring the repository or
-contributing feedback to improve it further.
+* 📧 **Email:** [m10ferrari1200@gmail.com](mailto:m10ferrari1200@gmail.com)
+* 📧 **Email:** [contatolinuxdicaspro@gmail.com](mailto:contatolinuxdicaspro@gmail.com)
